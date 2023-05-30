@@ -35,12 +35,10 @@ public class Post {
     LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    //@JsonIgnore
+
     private List<FileData> fileDataList;
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "file_data_id")
-//    private FileData fileData;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -27,7 +27,5 @@ public class FileData {
     @JsonBackReference
     private Post post;
 
-//    @OneToOne(mappedBy = "fileData")
-//    @JoinColumn(name = "post_id")
-//    private Post post;
+
 }
