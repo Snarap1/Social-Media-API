@@ -1,7 +1,6 @@
 package sprng.boot.socialmediaapi.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -54,6 +52,16 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "follower_id")
     )
     private Set<User> followers;
+
+    @JsonIgnore
+    @ManyToMany
+    @JoinTable(
+            name = "friend_requests",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "request_id")
+    )
+    private Set<User> friendRequests;
+
 
     @JsonIgnore
     @ManyToMany

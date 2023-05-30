@@ -64,12 +64,11 @@ public class UserController {
         User receiver = userService.getReceiverById(receiverId);
 
         sender.addSubscription(receiver);
-
-
         receiver.getFollowers().add(sender);
-        userService.saveUser(sender);
-        userService.saveUser(receiver);
 
+        receiver.getFriendRequests().add(sender);
+
+        userService.saveUsers(receiver,sender);
         return ResponseEntity.ok("Friend request sent");
     }
 
@@ -82,10 +81,12 @@ public class UserController {
 
         User sender = userService.getSenderById(senderId);
 
-        receiver.getFollowers().remove(sender);
-        receiver.getFriends().add(sender);
+        receiver.getFriendRequests().remove(sender);
 
-        sender.getFollowers().remove(receiver);
+        receiver.getFriends().add(sender);
+        receiver.addSubscription(sender);
+
+        sender.getFollowers().add(receiver);
         sender.getFriends().add(receiver);
 
        userService.saveUsers(receiver,sender);
@@ -102,17 +103,55 @@ public class UserController {
 
         User sender = userService.getSenderById(senderId);
 
+        receiver.getFriendRequests().remove(sender);
 
-        receiver.getFollowers().remove(sender);
         userService.saveUser(receiver);
 
         return ResponseEntity.ok("Friend request rejected");
     }
 
+    //удалить из друзей
+    @PostMapping("/{userId}/remove-friend/{friendId}")
+    public ResponseEntity<String> removeFriend(
+            @PathVariable Long userId,
+            @PathVariable Long friendId) {
+
+        User user = userService.getUserById(userId);
+        User friend = userService.getUserById(friendId);
+
+        user.getSubscriptions().remove(friend);
+        user.getFriends().remove(friend);
+
+        friend.getFriends().remove(user);
+        friend.getFollowers().remove(user);
+
+
+        userService.saveUsers(user,friend);
+        return ResponseEntity.ok("Friend removed");
+    }
+
+    //отписаться
+    @PostMapping("/{userId}/unfollow/{subscriptionId}")
+    public ResponseEntity<String> unfollow(
+            @PathVariable Long userId,
+            @PathVariable Long subscriptionId) {
+
+        User user = userService.getUserById(userId);
+        User sub = userService.getUserById(subscriptionId);
+
+        user.getSubscriptions().remove(sub);
+
+        sub.getFollowers().remove(user);
+
+        userService.saveUsers(user,sub);
+        return ResponseEntity.ok("Unfollowed");
+    }
+
+
 
     // get followers and friends // and subscriptions
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<Set<User>> getFollowers(@PathVariable Long userId) {
+    public ResponseEntity<Set<User>> getFriendRequestsList(@PathVariable Long userId) {
         User user = userService.getUserById(userId);
 
         Set<User> followers = user.getFollowers();
@@ -128,10 +167,17 @@ public class UserController {
         return ResponseEntity.ok(friends);
     }
 
+    @GetMapping("/{userId}/friendRequests")
+    public ResponseEntity<Set<User>> getFriendRequests(@PathVariable Long userId) {
+        User user = userService.getUserById(userId);
+        Set<User> friendRequests = user.getFriendRequests();
+
+        return ResponseEntity.ok(friendRequests);
+    }
+
     @GetMapping("/{userId}/subscriptions")
     public ResponseEntity<Set<User>> getSubscriptions(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getSubscriptions(userId));
-
     }
 
 }
