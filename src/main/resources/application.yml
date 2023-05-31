@@ -16,7 +16,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     multipart:
-      file-size-threshold: 5MB
+      file-size-threshold: 10MB
 
 application:
   security:

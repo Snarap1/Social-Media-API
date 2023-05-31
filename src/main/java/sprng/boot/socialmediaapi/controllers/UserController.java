@@ -1,21 +1,31 @@
 package sprng.boot.socialmediaapi.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import sprng.boot.socialmediaapi.dto.UserDTO;
+import sprng.boot.socialmediaapi.dto.UserDTOResponse;
 import sprng.boot.socialmediaapi.models.User;
 import sprng.boot.socialmediaapi.services.UserService;
 
+import java.util.HashSet;
 import java.util.Set;
 
 
 @RestController
 @RequestMapping("/users")
+@Tag(name = "User Controller",description = "Контроллер для взаимодействия пользователей")
 public class UserController {
 
-    private  final ModelMapper modelMapper;
+    private  final  ModelMapper modelMapper;
     private  final  UserService userService;
 
     @Autowired
@@ -24,160 +34,209 @@ public class UserController {
         this.userService = userService;
     }
 
-    // DTO converters
-    private  User  convertToUser(UserDTO userDTO){
-        return modelMapper.map(userDTO, User.class);
-    }
-
-    private UserDTO convertToDTO(User user){
-         return modelMapper.map(user,UserDTO.class);
-    }
-
-    //crud dlya usera
+    @Operation(
+            summary = "Получить пользователя",
+            description = "Позволяет получить пользователя по его ID"
+    )
     @GetMapping("/{userId}")
     public  ResponseEntity<UserDTO> getUser(
-            @PathVariable Long userId
+            @PathVariable @Parameter(description = "ID пользователя") Long userId
     ){
         User user = userService.getUserById(userId);
-        UserDTO userDTO = convertToDTO(user);
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
 
         return ResponseEntity.ok(userDTO);
     }
 
+    @Operation(
+            summary = "Добавить пользователя (только для внутренних тестов)",
+            description = "Позволяет добавить пользователя, однако не авторизовывая его"
+    )
     @PostMapping("/add")
-    public  ResponseEntity<String> addUser(@RequestBody UserDTO userDTO){
-        System.out.println(userDTO.getUsername());
-        User user = convertToUser(userDTO);
-        System.out.println(user.getEmail());
+    public  ResponseEntity<String> addUser(
+            @RequestBody @Parameter(description = "Параметры пользователя") @Valid UserDTO userDTO
+            ,BindingResult bindingResult) throws BindException {
+      userService.check(bindingResult);
+
+        User user = modelMapper.map(userDTO, User.class);
         userService.saveUser(user);
-        return ResponseEntity.ok("User created");
+            return ResponseEntity.ok("User created");
+    }
+
+    @Operation(
+            summary = "Удалить пользователя",
+            description = "Позволяет удалить пользователя"
+    )
+    @DeleteMapping("/{userId}")
+    public  ResponseEntity<String> removeUser(@PathVariable @Parameter(description = "ID пользователя") Long userId){
+        userService.delete(userId);
+        return ResponseEntity.ok("User deleted");
     }
 
 
-    // communication between users: dobavlyaem to friend, accept a reject/ POST methods tyt bydyt
+    @Operation(
+            summary = "Отправить заявку в друзья",
+            description = "Позволяет добавиться в друзья"
+    )
     @PostMapping("/{senderId}/friend-request/{receiverId}")
     public ResponseEntity<String> sendFriendRequest(
-            @PathVariable Long senderId,
-            @PathVariable Long receiverId) {
+            @PathVariable @Parameter(description = "ID пользователя отправляющего заявку") Long senderId,
+            @PathVariable @Parameter(description = "ID пользователя получающего заявку") Long receiverId) {
 
         User sender = userService.getSenderById(senderId);
         User receiver = userService.getReceiverById(receiverId);
 
-        sender.addSubscription(receiver);
-        receiver.getFollowers().add(sender);
+        userService.getFriendRequest(sender,receiver);
 
-        receiver.getFriendRequests().add(sender);
-
-        userService.saveUsers(receiver,sender);
         return ResponseEntity.ok("Friend request sent");
     }
 
+
+    @Operation(
+            summary = "Принять заявку",
+            description = "Позволяет принять заявку в друзья"
+    )
     @PostMapping("/{receiverId}/accept-friend-request/{senderId}")
     public ResponseEntity<String> acceptFriendRequest(
-            @PathVariable Long receiverId,
-            @PathVariable Long senderId) {
+            @PathVariable @Parameter(description = "ID пользователя получившего заявку") Long receiverId,
+            @PathVariable @Parameter(description = "ID пользователя отправившего заявку")  Long senderId) {
 
         User receiver = userService.getReceiverById(receiverId);
-
         User sender = userService.getSenderById(senderId);
 
-        receiver.getFriendRequests().remove(sender);
-
-        receiver.getFriends().add(sender);
-        receiver.addSubscription(sender);
-
-        sender.getFollowers().add(receiver);
-        sender.getFriends().add(receiver);
-
-       userService.saveUsers(receiver,sender);
+        userService.acceptFriend(receiver,sender);
 
         return ResponseEntity.ok("Friend request accepted");
     }
 
+    @Operation(
+            summary = "Отклонить заявку заявку",
+            description = "Позволяет отклонить заявку в друзья"
+    )
     @PostMapping("/{receiverId}/reject-friend-request/{senderId}")
     public ResponseEntity<String> rejectFriendRequest(
-            @PathVariable Long receiverId,
-            @PathVariable Long senderId) {
+            @PathVariable @Parameter(description = "ID пользователя получившего заявку")  Long receiverId,
+            @PathVariable @Parameter(description = "ID пользователя отправившего заявку") Long senderId) {
 
         User receiver = userService.getReceiverById(receiverId);
-
         User sender = userService.getSenderById(senderId);
 
-        receiver.getFriendRequests().remove(sender);
-
-        userService.saveUser(receiver);
+        userService.rejectFriend(receiver,sender);
 
         return ResponseEntity.ok("Friend request rejected");
     }
 
-    //удалить из друзей
+    @Operation(
+            summary = "Удалить из друзей",
+            description = "Позволяет удалить пользователя из друзей"
+    )
     @PostMapping("/{userId}/remove-friend/{friendId}")
     public ResponseEntity<String> removeFriend(
-            @PathVariable Long userId,
-            @PathVariable Long friendId) {
+            @PathVariable @Parameter(description = "ID пользователя")  Long userId,
+            @PathVariable @Parameter(description = "ID друга")  Long friendId) {
 
         User user = userService.getUserById(userId);
         User friend = userService.getUserById(friendId);
 
-        user.getSubscriptions().remove(friend);
-        user.getFriends().remove(friend);
+        userService.removeFriend(user,friend);
 
-        friend.getFriends().remove(user);
-        friend.getFollowers().remove(user);
-
-
-        userService.saveUsers(user,friend);
         return ResponseEntity.ok("Friend removed");
     }
 
-    //отписаться
+    @Operation(
+            summary = "Отписаться",
+            description = "Позволяет пользователю отписаться от другого пользователя"
+    )
     @PostMapping("/{userId}/unfollow/{subscriptionId}")
-    public ResponseEntity<String> unfollow(
-            @PathVariable Long userId,
-            @PathVariable Long subscriptionId) {
+    public ResponseEntity<String> unfollowRequest(
+            @PathVariable @Parameter(description = "ID пользователя") Long userId,
+            @PathVariable @Parameter(description = "ID пользователя от которого надо отписатсья") Long subscriptionId) {
 
         User user = userService.getUserById(userId);
         User sub = userService.getUserById(subscriptionId);
 
-        user.getSubscriptions().remove(sub);
+        userService.unfollow(user,sub);
 
-        sub.getFollowers().remove(user);
-
-        userService.saveUsers(user,sub);
         return ResponseEntity.ok("Unfollowed");
     }
 
-
-
-    // get followers and friends // and subscriptions
+    @Operation(
+            summary = "Список подписчиков",
+            description = "Позволяет получить список подписчиков пользователя"
+    )
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<Set<User>> getFriendRequestsList(@PathVariable Long userId) {
+    public ResponseEntity<?> getFriendRequestsList(
+            @PathVariable @Parameter(description = "ID пользователя") Long userId) {
+
         User user = userService.getUserById(userId);
 
-        Set<User> followers = user.getFollowers();
+        Set<UserDTOResponse> followers = new HashSet<>();
+            for (User element : user.getFollowers()) {
+                UserDTOResponse map = modelMapper.map(element, UserDTOResponse.class);
+                followers.add(map);
+            }
 
         return ResponseEntity.ok(followers);
     }
 
+    @Operation(
+            summary = "Список друзей",
+            description = "Позволяет получить список друзей пользователя"
+    )
     @GetMapping("/{userId}/friends")
-    public ResponseEntity<Set<User>> getFriends(@PathVariable Long userId) {
+    public ResponseEntity<?> getFriends(
+            @PathVariable @Parameter(description = "ID пользователя") Long userId)  {
+
         User user = userService.getUserById(userId);
-        Set<User> friends = user.getFriends();
+
+        Set<UserDTOResponse>  friends = new HashSet<>();
+            for (User element : user.getFriends()) {
+                UserDTOResponse map = modelMapper.map(element, UserDTOResponse.class);
+                friends.add(map);
+            }
 
         return ResponseEntity.ok(friends);
     }
 
+    @Operation(
+            summary = "Запросы в друзья",
+            description = "Позволяет получить список запросов в друзья для пользователя"
+    )
     @GetMapping("/{userId}/friendRequests")
-    public ResponseEntity<Set<User>> getFriendRequests(@PathVariable Long userId) {
+    public ResponseEntity<?> getFriendRequests(
+            @PathVariable @Parameter(description = "ID пользователя") Long userId)  {
+
         User user = userService.getUserById(userId);
-        Set<User> friendRequests = user.getFriendRequests();
+
+        Set<UserDTOResponse>  friendRequests = new HashSet<>();
+            for (User element : user.getFriendRequests()) {
+                UserDTOResponse map = modelMapper.map(element, UserDTOResponse.class);
+                friendRequests.add(map);
+            }
 
         return ResponseEntity.ok(friendRequests);
     }
 
+    @Operation(
+            summary = "Подписки",
+            description = "Позволяет получить список тех на кого подписан пользователь"
+    )
     @GetMapping("/{userId}/subscriptions")
-    public ResponseEntity<Set<User>> getSubscriptions(@PathVariable Long userId) {
-        return ResponseEntity.ok(userService.getSubscriptions(userId));
+    public ResponseEntity<?> getSubscriptions(
+            @PathVariable @Parameter(description = "ID пользователя") Long userId) {
+
+        User user = userService.getUserById(userId);
+
+        Set<UserDTOResponse> subscriptions = new HashSet<>();
+            for (User element : user.getSubscriptions()) {
+                UserDTOResponse map = modelMapper.map(element, UserDTOResponse.class);
+                subscriptions.add(map);
+            }
+
+        return ResponseEntity.ok(subscriptions);
     }
+
+
+
 
 }

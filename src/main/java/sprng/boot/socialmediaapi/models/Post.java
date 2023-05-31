@@ -3,6 +3,7 @@ package sprng.boot.socialmediaapi.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import jdk.jfr.Timespan;
 import jdk.jfr.Timestamp;
 import lombok.AllArgsConstructor;
@@ -25,17 +26,19 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @Column(name = "title")
+    @Size(max = 100, message = "Title must be less than or equal to 100 characters")
     private String title;
 
     @Column(name = "content")
+    @Size(max = 500, message = "Content must be less than or equal to 500 characters")
     private String content;
 
     @Column(name = "created_at")
     LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-
     private List<FileData> fileDataList;
 
 
@@ -45,10 +48,12 @@ public class Post {
     @JsonBackReference
     private User user;
 
+    //ставим значение NOW
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
 
     public void addFileData(FileData fileData) {
         if (fileDataList == null) {

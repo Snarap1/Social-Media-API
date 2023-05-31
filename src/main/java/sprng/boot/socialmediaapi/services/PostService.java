@@ -28,7 +28,11 @@ public class PostService {
 
     // method dlya user profile
     public List<Post> getAllPostByUser(User user){
-        return postRepository.findAllByUserOrderByCreatedAt(user);
+        List<Post> posts = postRepository.findAllByUserOrderByCreatedAt(user);
+        if(posts.isEmpty())
+            throw new IllegalArgumentException("Posts not found");
+
+        return posts;
     }
 
     public  List<Post> getAllPosts(){
@@ -36,11 +40,19 @@ public class PostService {
     }
 
     public  Post getPost(long id){
-        return postRepository.findById(id);
+        Post post = postRepository.findById(id);
+        if (post==null)
+            throw  new IllegalArgumentException("Post not found");
+
+        return post;
     }
 
     public  void deletePostById(long id){
-        postRepository.deleteById(id);
+        Post post = postRepository.findById(id);
+        if (post==null)
+            throw  new IllegalArgumentException("Post not found");
+
+        postRepository.delete(post);
     }
 
     //для ленты активностей
@@ -61,17 +73,22 @@ public class PostService {
 
     //добавить изображение к посту
     public  void  addImageToPost(Long post_id, MultipartFile file) throws Exception {
-        Post post = postRepository.findById(post_id);
 
-        if (post==null){
-            throw  new Exception("post didnt found");
-        }
+         Post post = postRepository.findById(post_id);
+        if (post==null)
+            throw  new IllegalArgumentException("Post not found");
 
         FileData fileData = storageService.uploadImageToFileSystem(file);
         post.addFileData(fileData);
         fileData.setPost(post);
         postRepository.save(post);
 
+    }
+
+    public  void  editPost(Post post, Post postForSave){
+        postForSave.setTitle(post.getTitle());
+        postForSave.setContent(post.getContent());
+        savePost(postForSave);
     }
 
 }
