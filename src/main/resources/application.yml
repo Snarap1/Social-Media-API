@@ -1,7 +1,7 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/socialmedia_db
-    #url: jdbc:postgresql://postgresql_db/smartcart_db
+    #url: jdbc:postgresql://localhost:5432/socialmedia_db
+    url: jdbc:postgresql://postgresql_db/socialmedia_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver

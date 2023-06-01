@@ -140,7 +140,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>smart-cart-repo</finalName>
+		<finalName>social-media-api</finalName>
 	</build>
 
 </project>

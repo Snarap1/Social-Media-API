@@ -1,0 +1,5 @@
+sprng\boot\socialmediaapi\repository\PostRepositoryTests.class
+sprng\boot\socialmediaapi\services\PostServiceTest.class
+sprng\boot\socialmediaapi\repository\UserRepositoryTest.class
+sprng\boot\socialmediaapi\services\UserServiceTest2.class
+sprng\boot\socialmediaapi\services\UserServiceTests.class
