@@ -18,10 +18,10 @@ public class StorageService {
     @Autowired
     private FileDataRepository fileDataRepository;
 
-    private final String FOLDER_PATH="D:/Social-media-api/Social-Media-API/src/main/resources/SocialMediaApiImages/";
+    private final String FOLDER_PATH="D:\\Social-media-api\\Social-Media-API\\src\\main\\resources\\SocialMediaApiImages\\";
 
     public FileData uploadImageToFileSystem(MultipartFile file) throws IOException {
-        String filePath=FOLDER_PATH+file.getOriginalFilename();
+        String filePath=FOLDER_PATH +file.getOriginalFilename();
 
         FileData fileData=fileDataRepository.save(FileData.builder()
                 .name(file.getOriginalFilename())

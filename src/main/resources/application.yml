@@ -1,7 +1,7 @@
 spring:
   datasource:
-    #url: jdbc:postgresql://localhost:5432/socialmedia_db
-    url: jdbc:postgresql://postgresql_db/socialmedia_db
+    url: jdbc:postgresql://localhost:5432/socialmedia_db
+    #url: jdbc:postgresql://postgresql_db/socialmedia_db
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -25,4 +25,3 @@ application:
       expiration: 86400000 # 1 день
       refresh-token:
         expiration: 604800000 # 7 дней
-

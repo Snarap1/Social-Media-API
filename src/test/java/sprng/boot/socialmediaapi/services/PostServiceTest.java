@@ -44,11 +44,14 @@ public class PostServiceTest {
 
     @Test
     public void testSavePost() {
+        //создаём
         Post post = new Post();
         post.setTitle("Test Post");
 
+        //вызываем
         postService.savePost(post);
 
+        //проверяем
         verify(postRepository).save(postCaptor.capture());
         Post capturedPost = postCaptor.getValue();
         Assertions.assertEquals(post, capturedPost);
@@ -56,6 +59,7 @@ public class PostServiceTest {
 
     @Test
     public void testGetAllPostByUser() {
+        //создаём
         User user = new User();
         user.setId(1L);
         int page = 0;
@@ -64,24 +68,27 @@ public class PostServiceTest {
         expectedPosts.add(new Post());
         expectedPosts.add(new Post());
 
+        //вызываем
         when(postRepository.findAllByUserOrderByCreatedAtDesc(eq(user), any(PageRequest.class))).thenReturn(expectedPosts);
-
         List<Post> actualPosts = postService.getAllPostByUser(user, page, size);
 
+        //проверяем
         verify(postRepository).findAllByUserOrderByCreatedAtDesc(eq(user), any(PageRequest.class));
         Assertions.assertEquals(expectedPosts, actualPosts);
     }
 
     @Test
     public void testGetAllPosts() {
+        //создаём
         List<Post> expectedPosts = new ArrayList<>();
         expectedPosts.add(new Post());
         expectedPosts.add(new Post());
 
+        //вызываем
         when(postRepository.findAll()).thenReturn(expectedPosts);
-
         List<Post> actualPosts = postService.getAllPosts();
 
+        //проверяем
         verify(postRepository).findAll();
         Assertions.assertEquals(expectedPosts, actualPosts);
     }

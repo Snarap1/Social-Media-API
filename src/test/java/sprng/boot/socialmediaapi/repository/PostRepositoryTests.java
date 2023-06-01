@@ -35,15 +35,13 @@ public class PostRepositoryTests {
 
     @Test
     public void testFindAllByUserOrderByCreatedAtDesc() {
-        // Создаем пользователя и сохраняем его в базу данных
+        // Arrange
         User user = new User();
         user.setNickname("Bob");
         user.setEmail("bob@mail.com");
         user.setPassword("password");
         userRepository.save(user);
 
-
-        // Создаем несколько постов для данного пользователя и сохраняем их в базу данных
         Post post1 = new Post();
         post1.setTitle("post1");
         post1.setContent("post1");
@@ -56,29 +54,26 @@ public class PostRepositoryTests {
         post2.setUser(user);
         post1.setCreatedAt(LocalDateTime.now());
 
-        // Сохраняем посты в базу данных
         postRepository.save(post1);
         postRepository.save(post2);
 
-        // Вызываем метод, который тестируем
+        // act
         List<Post> posts = postRepository.findAllByUserOrderByCreatedAtDesc(user, Pageable.unpaged());
 
-        // Проверяем, что количество найденных постов соответствует ожидаемому
+        // assert
         Assertions.assertEquals(2, posts.size());
 
     }
 
     @Test
     public void testFindAllByUser() {
-        // Создаем пользователя и сохраняем его в базу данных
+        //создаём
         User user = new User();
         user.setNickname("Bob");
         user.setEmail("bob@mail.com");
         user.setPassword("qwerty123");
         userRepository.save(user);
 
-
-        // Создаем несколько постов для данного пользователя и сохраняем их в базу данных
         Post post1 = new Post();
         post1.setTitle("post1");
         post1.setContent("post1");
@@ -89,14 +84,13 @@ public class PostRepositoryTests {
         post2.setContent("post1");
         post2.setUser(user);
 
-        // Сохраняем посты в базу данных
         postRepository.save(post1);
         postRepository.save(post2);
 
-        // Вызываем метод, который тестируем
+        // Вызываем метод
         List<Post> posts = postRepository.findAllByUser(user);
 
-        // Проверяем, что количество найденных постов соответствует ожидаемому
+        // Проверяем
         Assertions.assertEquals(2, posts.size());
 
     }

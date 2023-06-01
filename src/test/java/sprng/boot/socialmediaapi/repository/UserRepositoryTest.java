@@ -25,14 +25,14 @@ public class UserRepositoryTest {
 
     @Test
     public void testFindByEmail() {
-        // Создаем нового пользователя
+        // Создаем
         User user = new User();
         user.setNickname("John");
         user.setEmail("john@example.com");
         user.setPassword("password");
         userRepository.save(user);
 
-        // Вызываем тестируемый метод
+        // Вызываем
         Optional<User> foundUser = userRepository.findByEmail("john@example.com");
 
         // Проверяем
@@ -42,16 +42,14 @@ public class UserRepositoryTest {
 
     @Test
     public void testSave() {
-        // Создаем нового пользователя
+        // Создаем
         User user = new User();
         user.setNickname("Alice");
         user.setEmail("alice@gmail.com");
         user.setPassword("password");
 
-        // Сохраняем пользователя с помощью репозитория
+        // вызываем
         User savedUser = userRepository.save(user);
-
-        // Получаем сохраненного пользователя из репозитория
         User retrievedUser = userRepository.findById(savedUser.getId()).orElse(null);
 
         // Проверяем

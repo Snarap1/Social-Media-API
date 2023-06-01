@@ -31,111 +31,89 @@ class UserServiceTest2 {
 
     @Test
     void testGetUserById_ValidId_ReturnsUser() {
-        // Arrange
         Long id = 1L;
         User user = new User();
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
-        // Act
         User result = userService.getUserById(id);
 
-        // Assert
         assertEquals(user, result);
     }
 
     @Test
     void testGetUserById_InvalidId_ThrowsException() {
-        // Arrange
         Long id = 1L;
         when(userRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(IllegalArgumentException.class, () -> userService.getUserById(id));
     }
 
     @Test
     void testGetUsers_ReturnsListOfUsers() {
-        // Arrange
         List<User> users = Arrays.asList(new User(), new User());
         when(userRepository.findAll()).thenReturn(users);
 
-        // Act
         List<User> result = userService.getUsers();
 
-        // Assert
         assertEquals(users, result);
     }
 
     @Test
     void testGetSenderById_ValidId_ReturnsUser() {
-        // Arrange
         long id = 1L;
         User user = new User();
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
-        // Act
         User result = userService.getSenderById(id);
 
-        // Assert
         assertEquals(user, result);
     }
 
     @Test
     void testGetSenderById_InvalidId_ThrowsException() {
-        // Arrange
         long id = 1L;
+
         when(userRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(IllegalArgumentException.class, () -> userService.getSenderById(id));
     }
 
     @Test
     void testGetReceiverById_ValidId_ReturnsUser() {
-        // Arrange
         long id = 1L;
         User user = new User();
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
-        // Act
         User result = userService.getReceiverById(id);
 
-        // Assert
         assertEquals(user, result);
     }
 
     @Test
     void testGetReceiverById_InvalidId_ThrowsException() {
-        // Arrange
         long id = 1L;
         when(userRepository.findById(id)).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(IllegalArgumentException.class, () -> userService.getReceiverById(id));
     }
 
     @Test
     void testSaveUser_CallsUserRepositorySave() {
-        // Arrange
         User user = new User();
 
-        // Act
         userService.saveUser(user);
 
-        // Assert
         verify(userRepository, times(1)).save(user);
     }
 
     @Test
     void testSaveUsers_CallsUserRepositorySaveAll() {
-        // Arrange
+        // создаём
         User receiver = new User();
         User sender = new User();
 
-        // Act
         userService.saveUsers(receiver, sender);
 
-        // Assert
         verify(userRepository, times(1)).saveAll(Arrays.asList(receiver, sender));
     }
 
@@ -148,10 +126,9 @@ class UserServiceTest2 {
         user.setSubscriptions(subscriptions);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-        // Act
+
         Set<User> result = userService.getSubscriptions(user);
 
-        // Assert
         assertEquals(subscriptions, result);
     }
 
