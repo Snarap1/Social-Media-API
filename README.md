@@ -27,7 +27,8 @@
 После запуска в консоль будет выведен SuperUser token, что бы не аутентифицироваться каждый раз.
 
 Ниже будет представлена краткая документация, полную документацию  можно посмотреть перейдя по ссылке:
-http://localhost:8080/swagger-ui/index.html#
+http://localhost:8080/swagger-ui/index.html#  (запустив проект)
+https://app.swaggerhub.com/apis/Snarap1/social-media-api/1.0.0  (без запуска)
 
 | Method  | URL  | Description |
 | :------------ |:---------------:| -----:|
