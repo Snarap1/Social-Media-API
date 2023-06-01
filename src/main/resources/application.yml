@@ -25,3 +25,4 @@ application:
       expiration: 86400000 # 1 день
       refresh-token:
         expiration: 604800000 # 7 дней
+

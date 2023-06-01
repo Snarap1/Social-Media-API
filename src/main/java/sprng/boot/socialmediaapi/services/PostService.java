@@ -1,12 +1,17 @@
 package sprng.boot.socialmediaapi.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sprng.boot.socialmediaapi.models.FileData;
 import sprng.boot.socialmediaapi.models.Post;
 import sprng.boot.socialmediaapi.models.User;
 import sprng.boot.socialmediaapi.repository.PostRepository;
+import sprng.boot.socialmediaapi.utils.Pagination;
 
 import java.io.IOException;
 import java.util.*;
@@ -26,9 +31,10 @@ public class PostService {
         postRepository.save(post);
     }
 
-    // method dlya user profile
-    public List<Post> getAllPostByUser(User user){
-        List<Post> posts = postRepository.findAllByUserOrderByCreatedAt(user);
+    // все посты пользователя
+    public List<Post> getAllPostByUser(User user, int page,int size){
+        List<Post> posts = postRepository.findAllByUserOrderByCreatedAtDesc(user, PageRequest.of(page,size));
+
         if(posts.isEmpty())
             throw new IllegalArgumentException("Posts not found");
 
@@ -56,19 +62,18 @@ public class PostService {
     }
 
     //для ленты активностей
-    public List<Post> getPostForActivityLent(User user){
+    public List<Post> getPostForActivityLent(User user,int page,int size){
+        Pagination pagination = new Pagination();
+
         List<Post> activityLent = new ArrayList<>();
         Set<User> userList = user.getSubscriptions();
         for(User subUsers : userList){
             activityLent.addAll(postRepository.findAllByUser(subUsers));
         }
-        //в порядке возрастания
-        // Comparator<Post> sortByCreatedAt = Comparator.comparing(Post::getCreatedAt);
-
         // в порядке убывания
         Comparator<Post> sortByCreatedAt = Comparator.comparing(Post::getCreatedAt).reversed();
         activityLent.sort(sortByCreatedAt);
-        return  activityLent;
+        return  pagination.paginate(activityLent,page,size);
     }
 
     //добавить изображение к посту

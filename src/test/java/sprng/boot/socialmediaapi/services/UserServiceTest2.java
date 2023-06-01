@@ -16,7 +16,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-class UserServiceTest {
+class UserServiceTest2 {
 
     @Mock
     private UserRepository userRepository;
@@ -149,19 +149,10 @@ class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         // Act
-        Set<User> result = userService.getSubscriptions(userId);
+        Set<User> result = userService.getSubscriptions(user);
 
         // Assert
         assertEquals(subscriptions, result);
     }
 
-    @Test
-    void testGetSubscriptions_InvalidUserId_ThrowsException() {
-        // Arrange
-        Long userId = 1L;
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        // Act and Assert
-        assertThrows(IllegalArgumentException.class, () -> userService.getSubscriptions(userId));
-    }
 }
