@@ -17,7 +17,7 @@
 
 ` docker-compose up`
 
-#####IDE:
+#####IDE setup:
 
 Откройте проект в вашей IDE
 Укажите название вашей базы данных в файле **application.yml**
