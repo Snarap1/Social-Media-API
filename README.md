@@ -10,66 +10,63 @@
 
 #####Docker setup:
 
-В папке проекта откройте терминал.
-Введите данные команды:
-
 ` ./mvnw clean package -DskipTests`
 
 ` docker-compose up`
 
 #####IDE:
 
-Откройте проект в вашей IDE
-Укажите название вашей базы данных в файле **application.yml**
-Запустите проект
+1) clone project
+2) Set db name at  **application.yml**
+3) start project
 
 -------------
-После запуска в консоль будет выведен SuperUser token, что бы не аутентифицироваться каждый раз.
+Look at console to get SuperUser authentication token.
 
-Ниже будет представлена краткая документация, **полную документацию  можно посмотреть перейдя по ссылке:**
-http://localhost:8080/swagger-ui/index.html#  (запустив проект)
-https://app.swaggerhub.com/apis/Snarap1/social-media-api/1.0.0  (без запуска)
-
-| Method  | URL  | Description |
-| :------------ |:---------------:| -----:|
-| POST   |/auth/register| Регистрация  |
-| POST     | /auth/authenticate       |   Аутентификация |
-| POST | /auth/refresh-token        |    обновление токена (в Postman в графу Bearer token (или нажав на замок напротив метода) передать refresh-token. В ответ получим новый access-token) |
+U can see short documentation, **follow link to get full documentation:**
+http://localhost:8080/swagger-ui/index.html# 
+https://app.swaggerhub.com/apis/Snarap1/social-media-api/1.0.0  
 
 | Method  | URL  | Description |
 | :------------ |:---------------:| -----:|
-| POST   |/posts/{userId}| Создать пост  |
-| POST     | /posts/image/{postId}       |   Прикрепить изображение (Что бы добавить изображение, в postman -> body-> form-data: для ключа 'image' выбрать и добавить файл из системы) |
-| PATCH | /posts/{postId}     |    изменить пост |
-| DELETE | /posts/{postId}   |    удалить пост |
-| GET | /posts/{postId}     |    посмотреть  пост |
-| GET | /posts/of/{userId}     |    получить все посты пользователя |
-| GET | /posts/activity/{userId}    | Лента активности для пользователя |
+| POST   |/auth/register| Registration  |
+| POST     | /auth/authenticate       |   Authentication |
+| POST | /auth/refresh-token        |    token refresh (set Bearer-token in postman, or paste it in Swagger) |
 
 | Method  | URL  | Description |
 | :------------ |:---------------:| -----:|
-| GET  |/users/{userId}| Получить информацию о пользователе  |
-| PATCH  |/users/{userId}}| Изменить информацию о пользователе  |
-| DELETE  |/users/{userId}}| Удалить пользователя |
-| GET  |/users/{userId}/subscriptions}| Список подписок пользователя |
-| GET  |/users/{userId}/friends|Список друзей пользователя
-| GET  |/users/{userId}/friendRequests| Запросы в друзья пользователю |
-| GET  |/users/{userId}/followers| Список подписчиков  |
-| POST  |/users/{senderId}/friend-request/{receiverId}| Отправить заявку в друзья |
-| POST  |/users/{receiverId}/accept-friend-request/{senderId}| Принять заявку|
-| POST  |/users/{receiverId}/reject-friend-request/{senderId}| Отклонить заявку |
-| POST  |/users/{userId}/remove-friend/{friendId}| Удалить из друзей |
-| POST  |/users/{userId}/unfollow/{subscriptionId}| Отписаться |
+| POST   |/posts/{userId}| Create post |
+| POST     | /posts/image/{postId}       | attach image(Postman -> body-> form-data: key 'image': chose file in your system) |
+| PATCH | /posts/{postId}     |    edit post |
+| DELETE | /posts/{postId}   |    delete post |
+| GET | /posts/{postId}     |   get 1 post |
+| GET | /posts/of/{userId}     |    get all User  posts  |
+| GET | /posts/activity/{userId}    | action feed of those to whom the user is following |
+
+| Method  | URL  | Description |
+| :------------ |:---------------:| -----:|
+| GET  |/users/{userId}| Get information about user |
+| PATCH  |/users/{userId}}| edit user information |
+| DELETE  |/users/{userId}}| delete user |
+| GET  |/users/{userId}/subscriptions}|subscriptions list for user |
+| GET  |/users/{userId}/friends| Users friend list|
+| GET  |/users/{userId}/friendRequests| friend requests list |
+| GET  |/users/{userId}/followers| User  Followers list  |
+| POST  |/users/{senderId}/friend-request/{receiverId}| send friend request |
+| POST  |/users/{receiverId}/accept-friend-request/{senderId}| Accept friend request|
+| POST  |/users/{receiverId}/reject-friend-request/{senderId}| Decline friend request |
+| POST  |/users/{userId}/remove-friend/{friendId}| Remove friend|
+| POST  |/users/{userId}/unfollow/{subscriptionId}| Unfollow |
 -------------
 
-Пример запроса на создание поста
+Create post example: 
 ```json
 {
   "title": "My title",
   "content": "mnogo texta"
 }
 ```
-Пример запроса на регистрацию пользователя
+User registration example: 
 ```json
 {
   "username": "user",
@@ -78,15 +75,13 @@ https://app.swaggerhub.com/apis/Snarap1/social-media-api/1.0.0  (без запу
   "role": "USER"
 }
 ```
-Пример запроса на аутентификацию пользователя
+User authentication request example 
 ```json
 {
   "email": "user@gmail.com",
   "password": "userpassword"
 }
 ```
-
-Взаимодействие между пользователями:
 
 [![](https://i.ibb.co/Q8Dq8rN/chrome-03t-Xc-NEqqs.png)](https://ibb.co/4s1DsPT)
 
